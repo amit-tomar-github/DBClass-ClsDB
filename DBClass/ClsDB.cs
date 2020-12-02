@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using System.IO;
 using System.Text;
+using Serilog;
 
 public class ClsDB
 {
@@ -198,22 +199,6 @@ public class ClsDB
             da.Dispose();
             return dt;
         }
-        catch (SqlException sqex)
-        {
-            /*
-             * When any error occured with parameter then it is difficult to produce the error from database by manually entering all the parameters.
-             * So whenever any error will occur it will send all the paremeter with value so that procedure can be executed from databse directly.
-             */
-            StringBuilder sb = new StringBuilder();
-#if DEBUG
-            sb.AppendLine($"Exec {cmd.CommandText}");
-#endif
-            foreach (SqlParameter param in cmd.Parameters)
-            {
-                sb.AppendLine($"{param.ParameterName} = {param.Value},");
-            }
-            throw new Exception(sqex.Message + ", Error Qry:-" + sb.ToString(), sqex);
-        }
         catch (Exception ex)
         {
             throw ex;
@@ -239,6 +224,18 @@ public class ClsDB
             da.Fill(dt);
             dt.Dispose();
             da.Dispose();
+            /*
+             * Monitor every quey in debug mode
+             */
+#if DEBUG
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Exec {cmd.CommandText}");
+            foreach (SqlParameter param in cmd.Parameters)
+            {
+                sb.AppendLine($"{param.ParameterName} = {param.Value},");
+            }
+            Log.Information(sb.ToString());
+#endif
             return dt;
         }
         catch (SqlException sqex)
@@ -285,6 +282,18 @@ public class ClsDB
             da.Fill(dt);
             dt.Dispose();
             da.Dispose();
+            /*
+             * Monitor every quey in debug mode
+             */
+#if DEBUG
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Exec {cmd.CommandText}");
+            foreach (SqlParameter param in cmd.Parameters)
+            {
+                sb.AppendLine($"{param.ParameterName} = {param.Value},");
+            }
+            Log.Information(sb.ToString());
+#endif
             return dt;
         }
         catch (SqlException sqex)
