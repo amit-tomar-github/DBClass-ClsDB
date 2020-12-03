@@ -218,7 +218,11 @@ public class ClsDB
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = ProcName;
             if (parameters != null)
+            {
+                //Clear Old parameter, since cmd is class global object so if same object will be used for different parameter then it will have others too
+                cmd.Parameters.Clear();
                 cmd.Parameters.AddRange(parameters);
+            }
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             DataTable dt = new DataTable();
             da.Fill(dt);
@@ -275,7 +279,11 @@ public class ClsDB
             if (DicParameter != null)
             {
                 foreach (var key in DicParameter.Keys)
+                {
+                    //Clear Old parameter, since cmd is class global object so if same object will be used for different parameter then it will have others too
+                    cmd.Parameters.Clear();
                     cmd.Parameters.AddWithValue(key, DicParameter[key]);
+                }
             }
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             DataTable dt = new DataTable();
